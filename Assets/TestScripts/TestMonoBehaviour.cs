@@ -1,5 +1,5 @@
 using FazApp;
-using FazApp.Core;
+using FazApp.EditorExtensions;
 using FazApp.SharedVariables;
 using UnityEngine;
 

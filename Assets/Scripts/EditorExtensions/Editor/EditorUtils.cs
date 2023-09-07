@@ -1,4 +1,4 @@
-namespace FazApp.Core.Unity.Editor
+namespace FazApp.EditorExtensions.Editor
 {
     public static class EditorUtils
     {

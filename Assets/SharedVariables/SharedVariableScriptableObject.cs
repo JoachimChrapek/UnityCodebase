@@ -1,4 +1,4 @@
-using FazApp.Core;
+using FazApp.EditorExtensions;
 using System;
 using UnityEngine;
 

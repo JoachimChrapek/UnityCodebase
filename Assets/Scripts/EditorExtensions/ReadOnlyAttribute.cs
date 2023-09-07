@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace FazApp.Core
+namespace FazApp.EditorExtensions
 {
     public class ReadOnlyAttribute : PropertyAttribute { }
 }

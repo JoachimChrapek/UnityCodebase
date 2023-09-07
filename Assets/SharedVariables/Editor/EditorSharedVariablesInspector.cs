@@ -1,5 +1,5 @@
+using FazApp.EditorExtensions.Editor;
 using System;
-using FazApp.Core.Unity.Editor;
 using UnityEditor;
 using UnityEngine;
 
