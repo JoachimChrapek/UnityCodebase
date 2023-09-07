@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace FazApp.SharedVariables.Unity
+namespace FazApp.SharedVariables
 {
     public class Vector3SharedVariableScriptableObject : SharedVariableScriptableObject<Vector3> { }
 }

@@ -1,5 +1,5 @@
 using FazApp.Core;
-using FazApp.SharedVariables.Unity;
+using FazApp.SharedVariables;
 using UnityEngine;
 
 namespace FazApp

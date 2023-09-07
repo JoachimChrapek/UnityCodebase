@@ -1,4 +1,4 @@
-namespace FazApp.SharedVariables.Unity
+namespace FazApp.SharedVariables
 {
     public class StringSharedVariableScriptableObject : SharedVariableScriptableObject<string> { }
 }

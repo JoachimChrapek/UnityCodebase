@@ -1,8 +1,8 @@
-using System;
 using FazApp.Core;
+using System;
 using UnityEngine;
 
-namespace FazApp.SharedVariables.Unity
+namespace FazApp.SharedVariables
 {
     public abstract class SharedVariableScriptableObject : ScriptableObject
     {
