@@ -1,14 +1,12 @@
 using FazApp.SharedVariables;
 using UnityEngine;
 
-namespace FazApp
+namespace FazApp.Examples.SharedVariables
 {
     public class TestIntVariable : SharedVariable<int>
     {
-        protected override int InitialValue => 69;
+        protected override int InitialValue => 50;
     }
-    
-    
     
     public class TestFloatVariable : SharedVariable<float> { }
     public class TestDoubleVariable : SharedVariable<double> { }

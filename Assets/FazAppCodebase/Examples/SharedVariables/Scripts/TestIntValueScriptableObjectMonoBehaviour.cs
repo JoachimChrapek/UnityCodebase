@@ -2,9 +2,9 @@ using FazApp.EditorExtensions;
 using FazApp.SharedVariables;
 using UnityEngine;
 
-namespace FazApp
+namespace FazApp.Examples.SharedVariables
 {
-    public class TestMonoBehaviour2 : MonoBehaviour
+    public class TestIntValueScriptableObjectMonoBehaviour : MonoBehaviour
     {
         [SerializeField]
         private IntSharedVariableScriptableObject testIntVariable;
@@ -27,7 +27,6 @@ namespace FazApp
         
         private void OnValueChanged(int value)
         {
-            Debug.Log("SO variable changed: " + value);
             UpdateValue();
         }
         
