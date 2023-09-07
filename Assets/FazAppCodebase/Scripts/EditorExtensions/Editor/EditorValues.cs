@@ -1,6 +1,6 @@
 namespace FazApp.EditorExtensions.Editor
 {
-    public class EditorValues
+    public static class EditorValues
     {
         public const string MenuItemRoot = "FazApp/";
     }
