@@ -7,7 +7,5 @@ namespace FazApp.SharedVariables.Editor
     {
         public List<SharedVariableTypeData> SharedVariablesTypeDataCollection { get; } = new();
         public Dictionary<Type, Type> ValueTypeToSharedVariableScriptableObjectTypeMap { get; } = new();
-        
-        public string SearchText { get; set; }
     }
 }

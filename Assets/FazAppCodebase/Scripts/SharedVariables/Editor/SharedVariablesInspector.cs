@@ -9,12 +9,14 @@ namespace FazApp.SharedVariables.Editor
         public event Action refreshRequested;
         
         protected SharedVariablesInspectorData InspectorData { get; private set; }
-
+        private SearchBarController searchBarController;
+        
         private Action delayedButtonAction;
         
-        public void Initialize(SharedVariablesInspectorData inspectorData)
+        public void Initialize(SharedVariablesInspectorData inspectorData, SearchBarController searchBarController)
         {
             InspectorData = inspectorData;
+            this.searchBarController = searchBarController;
         }
         
         public virtual void DrawInspector()
@@ -39,7 +41,7 @@ namespace FazApp.SharedVariables.Editor
 
         protected virtual bool CanDrawSharedVariable(Type sharedVariableType)
         {
-            return string.IsNullOrEmpty(InspectorData.SearchText) || sharedVariableType.FullName.Contains(InspectorData.SearchText, StringComparison.InvariantCultureIgnoreCase);
+            return string.IsNullOrEmpty(searchBarController.SearchText) || sharedVariableType.FullName.Contains(searchBarController.SearchText, StringComparison.InvariantCultureIgnoreCase);
         }
         
         private void TryInvokeDelayedButtonAction()

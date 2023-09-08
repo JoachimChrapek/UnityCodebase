@@ -86,7 +86,7 @@ namespace FazApp.SharedVariables.Editor
         private T InitializeInspector<T>() where T : SharedVariablesInspector, new()
         {
             T inspector = new ();
-            inspector.Initialize(inspectorData);
+            inspector.Initialize(inspectorData, searchBarController);
 
             inspector.reinitializeRequested += ReinitializeWindow;
             inspector.refreshRequested += RefreshWindow;
