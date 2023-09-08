@@ -11,14 +11,14 @@ namespace FazApp.SharedVariables.Editor
     {
         private const string WindowName = "Shared Variables Inspector";
 
-        private List<SharedVariableScriptableObject> scriptableObjectsCollection;
+        private SharedVariableScriptableObjectsContainer scriptableObjectsContainer;
         private SharedVariablesInspectorData inspectorData;
         
         private EditorSharedVariablesInspector editorInspector;
         private RuntimeSharedVariablesInspector runtimeInspector;
 
-        private SearchBarController searchBarController = new();
-        private ScrollControlller scrollController = new();
+        private readonly SearchBarController searchBarController = new();
+        private readonly ScrollControlller scrollController = new();
         
         [MenuItem(EditorValues.MenuItemRoot + WindowName)]
         private static void ShowWindow()
@@ -29,11 +29,6 @@ namespace FazApp.SharedVariables.Editor
 
         protected void OnGUI()
         {
-            if (!IsSharedVariableScriptableObjectsCollectionLoaded())
-            {
-                LoadSharedVariableScriptableObjectsCollection();
-            }
-            
             if (!IsInitialized())
             {
                 Initialize();
@@ -42,16 +37,10 @@ namespace FazApp.SharedVariables.Editor
             DrawInspector();
         }
 
-        
-        
-        private void OnDestroy()
-        {
-            //TODO decomission RuntimeInspector
-        }
-
         private void DrawInspector()
         {
-            DrawRefreshButton();
+            //TODO verify if we need refresh button - it should be automatic
+            ExtendedGUI.DrawButton("Refresh", RefreshWindow);
 
             GUILayout.Space(10);
             
@@ -59,6 +48,11 @@ namespace FazApp.SharedVariables.Editor
             
             GUILayout.Space(10);
             
+            DrawScrollableContent();
+        }
+
+        private void DrawScrollableContent()
+        {
             scrollController.BeginScrollView();
             
             if (Application.isPlaying)
@@ -73,63 +67,14 @@ namespace FazApp.SharedVariables.Editor
             scrollController.EndScrollView();
         }
 
-        // private void DrawSharedVariableScriptableObjectsContainerNotLoadedInfo()
-        // {
-        //     StringBuilder messageBuilder = new();
-        //     List<string> paths = SharedVariableScriptableObjectsLoader.GetAllSharedVariableScriptableObjectsContainerPathsCollection();
-        //
-        //     if (paths.Count == 0)
-        //     {
-        //         messageBuilder.AppendLine($"Couldn't find object of type {nameof(SharedVariableScriptableObjectsContainer)} in Assets folder");
-        //     }
-        //     else
-        //     {
-        //         messageBuilder.AppendLine($"Found multiple objects of type {nameof(SharedVariableScriptableObjectsContainer)} in Assets folder");
-        //
-        //         foreach (string path in paths)
-        //         {
-        //             messageBuilder.AppendLine(path);
-        //         }
-        //     }
-        //     
-        //     EditorGUILayout.HelpBox(messageBuilder.ToString(), MessageType.Error);
-        // }
-        
-        // private void DrawSharedVariableScriptableObjectsContainerInfo()
-        // {
-        //     GUI.enabled = false;
-        //     EditorGUILayout.ObjectField(nameof(SharedVariableScriptableObjectsContainer), scriptableObjectsContainer, typeof(SharedVariableScriptableObjectsContainer), false);
-        //     GUI.enabled = true;
-        // }
-        
-        private void DrawRefreshButton()
-        {
-            ExtendedGUI.DrawButton("Refresh", RefreshWindow);
-        }
-
-        private bool IsSharedVariableScriptableObjectsCollectionLoaded()
-        {
-            return scriptableObjectsCollection != null;
-        }
-
-        private void LoadSharedVariableScriptableObjectsCollection()
-        {
-            scriptableObjectsCollection = SharedVariableScriptableObjectsLoader.Load();
-        }
-        
         private bool IsInitialized()
         {
-            return inspectorData != null && editorInspector != null && runtimeInspector != null;
+            return scriptableObjectsContainer != null && inspectorData != null && editorInspector != null && runtimeInspector != null;
         }
         
         private void Initialize()
         {
-            if (scriptableObjectsCollection == null)
-            {
-                return;
-            }
-            
-            //scriptableObjectsContainer.ClearEmptyScriptableObjects();
+            scriptableObjectsContainer = new SharedVariableScriptableObjectsContainer();
             inspectorData = new SharedVariablesInspectorData();
             
             editorInspector = InitializeInspector<EditorSharedVariablesInspector>();
@@ -141,7 +86,7 @@ namespace FazApp.SharedVariables.Editor
         private T InitializeInspector<T>() where T : SharedVariablesInspector, new()
         {
             T inspector = new ();
-            inspector.Initialize(inspectorData, scriptableObjectsCollection);
+            inspector.Initialize(inspectorData);
 
             inspector.reinitializeRequested += ReinitializeWindow;
             inspector.refreshRequested += RefreshWindow;
@@ -151,7 +96,7 @@ namespace FazApp.SharedVariables.Editor
 
         private void ReinitializeWindow()
         {
-            LoadSharedVariableScriptableObjectsCollection();
+            scriptableObjectsContainer.RefreshScriptableObjectsCollection();
             RefreshSharedVariablesTypesCollection();
             RefreshWindow();
         }
@@ -166,11 +111,11 @@ namespace FazApp.SharedVariables.Editor
             RefreshValueTypeToSharedVariableScriptableObjectTypeMap();
             
             inspectorData.SharedVariablesTypeDataCollection.Clear();
-            IEnumerable<Type> sharedVariablesTypeCollection = GetSharedVariablesTypeCollection();
+            IEnumerable<Type> sharedVariablesTypeCollection = SharedVariablesUtilities.GetSharedVariablesTypeCollection();
             
             foreach (Type sharedVariableType in sharedVariablesTypeCollection)
             {
-                SharedVariableScriptableObject scriptableObjectInstance = GetSharedVariableScriptableObject(sharedVariableType);
+                SharedVariableScriptableObject scriptableObjectInstance = scriptableObjectsContainer.GetSharedVariableScriptableObject(sharedVariableType);
                 Type sharedVariableValueType = SharedVariablesUtilities.GetSharedVariableValueType(sharedVariableType);
                 bool haveScriptableObjectType = inspectorData.ValueTypeToSharedVariableScriptableObjectTypeMap.ContainsKey(sharedVariableValueType);
                 SharedVariableTypeData sharedVariableData = new (sharedVariableType, scriptableObjectInstance, sharedVariableValueType, haveScriptableObjectType);
@@ -188,17 +133,6 @@ namespace FazApp.SharedVariables.Editor
                 Type valueType = SharedVariablesUtilities.GetSharedVariableValueType(sharedVariableScriptableObjectType);
                 inspectorData.ValueTypeToSharedVariableScriptableObjectTypeMap.Add(valueType, sharedVariableScriptableObjectType);
             }
-        }
-        
-        private IEnumerable<Type> GetSharedVariablesTypeCollection()
-        {
-            return TypeCache.GetTypesDerivedFrom<SharedVariable>().Where(t => t.IsAbstract == false && t.IsInterface == false);
-        }
-        
-        private SharedVariableScriptableObject GetSharedVariableScriptableObject(Type sharedVariableType)
-        {
-            string sharedVariableTypeName = sharedVariableType.AssemblyQualifiedName;
-            return scriptableObjectsCollection.FirstOrDefault(sv => sv.AssignedSharedVariableTypeName == sharedVariableTypeName);
         }
     }
 }

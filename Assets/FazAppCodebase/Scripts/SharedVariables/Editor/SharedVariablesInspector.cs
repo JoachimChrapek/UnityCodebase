@@ -1,6 +1,5 @@
 using FazApp.EditorExtensions.Editor;
 using System;
-using System.Collections.Generic;
 
 namespace FazApp.SharedVariables.Editor
 {
@@ -10,14 +9,12 @@ namespace FazApp.SharedVariables.Editor
         public event Action refreshRequested;
         
         protected SharedVariablesInspectorData InspectorData { get; private set; }
-        protected List<SharedVariableScriptableObject> ScriptableObjectsCollection { get; private set; }
 
         private Action delayedButtonAction;
         
-        public void Initialize(SharedVariablesInspectorData inspectorData, List<SharedVariableScriptableObject> scriptableObjectsCollection)
+        public void Initialize(SharedVariablesInspectorData inspectorData)
         {
             InspectorData = inspectorData;
-            ScriptableObjectsCollection = scriptableObjectsCollection;
         }
         
         public virtual void DrawInspector()
