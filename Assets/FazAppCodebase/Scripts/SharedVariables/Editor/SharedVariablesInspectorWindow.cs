@@ -2,25 +2,23 @@ using FazApp.EditorExtensions.Editor;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using UnityEditor;
 using UnityEngine;
 
-namespace FazApp.SharedVariables.Unity.Editor
+namespace FazApp.SharedVariables.Editor
 {
     public class SharedVariablesInspectorWindow : ExtendedEditorWindow
     {
         private const string WindowName = "Shared Variables Inspector";
 
-        //private SharedVariableScriptableObjectsContainer scriptableObjectsContainer;
         private List<SharedVariableScriptableObject> scriptableObjectsCollection;
         private SharedVariablesInspectorData inspectorData;
         
         private EditorSharedVariablesInspector editorInspector;
         private RuntimeSharedVariablesInspector runtimeInspector;
 
-        private string searchText;
-        private Vector2 scrollPosition;
+        private SearchBarController searchBarController = new();
+        private ScrollControlller scrollController = new();
         
         [MenuItem(EditorValues.MenuItemRoot + WindowName)]
         private static void ShowWindow()
@@ -35,12 +33,6 @@ namespace FazApp.SharedVariables.Unity.Editor
             {
                 LoadSharedVariableScriptableObjectsCollection();
             }
-            
-            // if (!IsSharedVariableScriptableObjectsCollectionLoaded())
-            // {
-            //     DrawSharedVariableScriptableObjectsContainerNotLoadedInfo();
-            //     return;
-            // }
             
             if (!IsInitialized())
             {
@@ -59,16 +51,15 @@ namespace FazApp.SharedVariables.Unity.Editor
 
         private void DrawInspector()
         {
-            //DrawSharedVariableScriptableObjectsContainerInfo();
             DrawRefreshButton();
 
             GUILayout.Space(10);
             
-            DrawSearchBar();
+            searchBarController.DrawSearchBar();
             
             GUILayout.Space(10);
             
-            scrollPosition = EditorGUILayout.BeginScrollView(scrollPosition);
+            scrollController.BeginScrollView();
             
             if (Application.isPlaying)
             {
@@ -79,7 +70,7 @@ namespace FazApp.SharedVariables.Unity.Editor
                 editorInspector.DrawInspector();
             }
             
-            EditorGUILayout.EndScrollView();
+            scrollController.EndScrollView();
         }
 
         // private void DrawSharedVariableScriptableObjectsContainerNotLoadedInfo()
@@ -114,11 +105,6 @@ namespace FazApp.SharedVariables.Unity.Editor
         private void DrawRefreshButton()
         {
             ExtendedGUI.DrawButton("Refresh", RefreshWindow);
-        }
-
-        private void DrawSearchBar()
-        {
-            inspectorData.SearchText = EditorGUILayout.TextField("Search", inspectorData.SearchText);
         }
 
         private bool IsSharedVariableScriptableObjectsCollectionLoaded()

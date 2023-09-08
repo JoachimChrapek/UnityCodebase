@@ -1,6 +1,6 @@
 using System;
 
-namespace FazApp.SharedVariables.Unity.Editor
+namespace FazApp.SharedVariables.Editor
 {
     [Serializable]
     public class SharedVariableTypeData

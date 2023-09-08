@@ -1,9 +1,8 @@
 using System;
 using System.Collections.Generic;
-using FazApp.SharedVariables;
 using UnityEngine;
 
-namespace FazApp
+namespace FazApp.SharedVariables.Editor
 {
     public class SharedVariableContainer : ScriptableObject
     {

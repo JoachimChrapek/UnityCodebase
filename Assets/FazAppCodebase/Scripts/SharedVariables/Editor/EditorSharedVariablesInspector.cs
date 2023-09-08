@@ -3,7 +3,7 @@ using System;
 using UnityEditor;
 using UnityEngine;
 
-namespace FazApp.SharedVariables.Unity.Editor
+namespace FazApp.SharedVariables.Editor
 {
     public class EditorSharedVariablesInspector : SharedVariablesInspector
     {

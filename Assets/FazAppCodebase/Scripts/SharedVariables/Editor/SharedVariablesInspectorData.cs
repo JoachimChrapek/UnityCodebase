@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace FazApp.SharedVariables.Unity.Editor
+namespace FazApp.SharedVariables.Editor
 {
     public class SharedVariablesInspectorData
     {
