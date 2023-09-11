@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d487340c51d972044895d0660affe624, type: 3}
   m_Name: TestIntVariable
   m_EditorClassIdentifier: 
-  <AssignedSharedVariableTypeName>k__BackingField: FazApp.TestIntVariable, Assembly-CSharp,
-    Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+  <AssignedSharedVariableTypeName>k__BackingField: FazApp.Examples.SharedVariables.TestIntVariable,
+    Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
