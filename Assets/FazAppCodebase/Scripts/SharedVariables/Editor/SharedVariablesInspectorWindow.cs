@@ -118,6 +118,7 @@ namespace FazApp.SharedVariables.Editor
                 SharedVariableScriptableObject scriptableObjectInstance = scriptableObjectsContainer.GetSharedVariableScriptableObject(sharedVariableType);
                 Type sharedVariableValueType = SharedVariablesUtilities.GetSharedVariableValueType(sharedVariableType);
                 bool haveScriptableObjectType = inspectorData.ValueTypeToSharedVariableScriptableObjectTypeMap.ContainsKey(sharedVariableValueType);
+                
                 SharedVariableTypeData sharedVariableData = new (sharedVariableType, scriptableObjectInstance, sharedVariableValueType, haveScriptableObjectType);
                 inspectorData.SharedVariablesTypeDataCollection.Add(sharedVariableData);
             }

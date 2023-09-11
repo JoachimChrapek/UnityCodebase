@@ -6,126 +6,140 @@ namespace FazApp.SharedVariables.Editor
 {
     public class RuntimeSharedVariablesInspector : SharedVariablesInspector
     {
-        private SharedVariableContainer sharedVaraiblesContainer;
-        private SerializedObject sharedVaraiblesContainerSerializedObject;
+        private SharedVariableContainer sharedVariablesContainer;
+        private SerializedObject sharedVariablesContainerSerializedObject;
         private SerializedProperty sharedVariablesCollectionProperty;
 
         private UnityEditor.Editor cachedSharedVariabledContainerEditor;
 
         ~RuntimeSharedVariablesInspector()
         {
-            foreach (RuntimeSharedVariableInspectorData sharedVariableData in sharedVaraiblesContainer.SharedVariablesCollection)
+            foreach (RuntimeSharedVariableInspectorData sharedVariableData in sharedVariablesContainer.SharedVariablesCollection)
             {
                 sharedVariableData.CachedSharedVariable.editorValueChanged -= RefreshInspectorWindow;
             }
 
-            sharedVaraiblesContainer.DecomissionSharedVariables();
+            sharedVariablesContainer.DecomissionSharedVariables();
         }
 
         public override void DrawInspector()
         {
-            if (!IsSharedVariablesContainerInitialized())
+            if (!IsInitialized())
             {
-                InitializeSharedVariablesContainer();
+                Initialize();
             }
 
             base.DrawInspector();
 
-            if (sharedVaraiblesContainerSerializedObject == null)
-            {
-                sharedVaraiblesContainerSerializedObject = new SerializedObject(sharedVaraiblesContainer);
-            }
+            sharedVariablesContainerSerializedObject.Update();
+            DrawSharedVariablesCollection();
+        }
 
-            if (sharedVariablesCollectionProperty == null)
+        private void DrawSharedVariablesCollection()
+        {
+            for (int i = 0; i < sharedVariablesContainer.SharedVariablesCollection.Count; i++)
             {
-                sharedVariablesCollectionProperty = sharedVaraiblesContainerSerializedObject.FindProperty(EditorUtils.GetBackingFieldName(nameof(SharedVariableContainer.SharedVariablesCollection)));
+                RuntimeSharedVariableInspectorData sharedVariableData = sharedVariablesContainer.SharedVariablesCollection[i];
+                SharedVariable sharedVariable = sharedVariableData.CachedSharedVariable;
+                SerializedProperty sharedVariableSerializedProperty = sharedVariablesCollectionProperty.GetArrayElementAtIndex(i);
+
+                DrawSharedVariable(sharedVariable, sharedVariableData, sharedVariableSerializedProperty);
+            }
+        }
+
+        private void DrawSharedVariable(SharedVariable sharedVariable, RuntimeSharedVariableInspectorData sharedVariableData, SerializedProperty sharedVariableSerializedProperty)
+        {
+            if (!CanDrawSharedVariable(sharedVariable.GetType()))
+            {
+                return;
             }
             
-            sharedVaraiblesContainerSerializedObject.Update();
+            GUILayout.BeginVertical("box");
 
-            for (int i = 0; i < sharedVaraiblesContainer.SharedVariablesCollection.Count; i++)
+            ExtendedGUI.DrawLabel(sharedVariable.GetType().FullName);
+            sharedVariableData.IsAutoSaveEnabled = EditorGUILayout.Toggle("Auto save", sharedVariableData.IsAutoSaveEnabled);
+
+            DrawSharedVariableEditorValue(sharedVariableSerializedProperty, out bool valueChanged);
+            HandleEditorValueChange(valueChanged);
+            HandleAutoSaveOptions(sharedVariable, sharedVariableData.IsAutoSaveEnabled, valueChanged);
+
+            ExtendedGUI.DrawButton("Notify value changed", sharedVariable.ForceNotifyValueChanged);
+            
+            GUILayout.EndVertical();
+        }
+
+        private void DrawSharedVariableEditorValue(SerializedProperty sharedVariableSerializedProperty, out bool valueChanged)
+        {
+            EditorGUI.BeginChangeCheck();
+            EditorGUILayout.PropertyField(sharedVariableSerializedProperty.FindPropertyRelative(EditorUtils.GetBackingFieldName(nameof(RuntimeSharedVariableInspectorData.CachedSharedVariable)) + "." + EditorUtils.GetBackingFieldName("EditorValue")), true);
+            valueChanged = EditorGUI.EndChangeCheck();
+        }
+
+        private void HandleEditorValueChange(bool valueChanged)
+        {
+            if (!valueChanged)
             {
-                RuntimeSharedVariableInspectorData sharedVariableData = sharedVaraiblesContainer.SharedVariablesCollection[i];
-                SharedVariable sharedVariable = sharedVariableData.CachedSharedVariable;
+                return;
+            }
 
-                if (!CanDrawSharedVariable(sharedVariable.GetType()))
-                {
-                    break;
-                }
-                
-                GUILayout.BeginVertical("box");
+            sharedVariablesContainerSerializedObject.ApplyModifiedProperties();
+            sharedVariablesContainerSerializedObject.Update();
+        }
 
-                ExtendedGUI.DrawLabel(sharedVariable.GetType().FullName);
-
-                sharedVariableData.IsAutoSaveEnabled = EditorGUILayout.Toggle("Auto save", sharedVariableData.IsAutoSaveEnabled);
-
-                EditorGUI.BeginChangeCheck();
-                EditorGUILayout.PropertyField(sharedVariablesCollectionProperty.GetArrayElementAtIndex(i).FindPropertyRelative(EditorUtils.GetBackingFieldName(nameof(RuntimeSharedVariableInspectorData.CachedSharedVariable)) + "." + EditorUtils.GetBackingFieldName("EditorValue")), true);
-                
-                bool valueChanged = EditorGUI.EndChangeCheck();
-
+        private void HandleAutoSaveOptions(SharedVariable sharedVariable, bool isAutoSaveEnabled, bool valueChanged)
+        {
+            if (isAutoSaveEnabled)
+            {
                 if (valueChanged)
                 {
-                    sharedVaraiblesContainerSerializedObject.ApplyModifiedProperties();
-                    sharedVaraiblesContainerSerializedObject.Update();
+                    sharedVariable.UpdateValueAfterEditorChange();
                 }
-                
-                if (sharedVariableData.IsAutoSaveEnabled)
-                {
-                    if (valueChanged)
-                    {
-                        sharedVariable.UpdateValueAfterEditorChange();
-                    }
-                }
-                else
-                {
-                    if (GUILayout.Button("Save value"))
-                    {
-                        sharedVariable.UpdateValueAfterEditorChange();
-                    }
-
-                    if (GUILayout.Button("Reset value"))
-                    {
-                        sharedVariable.UpdateEditorValue();
-                    }
-                }
-
-                if (GUILayout.Button("Notify value changed"))
-                {
-                    sharedVariable.ForceNotifyValueChanged();
-                }
-
-                GUILayout.EndVertical();
+            }
+            else
+            {
+                ExtendedGUI.DrawButton("Save value", sharedVariable.UpdateValueAfterEditorChange);
+                ExtendedGUI.DrawButton("Reset value", sharedVariable.UpdateEditorValue);
             }
         }
-
-        private bool IsSharedVariablesContainerInitialized()
+        
+        private bool IsInitialized()
         {
-            return sharedVaraiblesContainer != null && sharedVaraiblesContainer.SharedVariablesCollection != null;
+            return sharedVariablesContainer != null && sharedVariablesContainer.SharedVariablesCollection != null && sharedVariablesContainerSerializedObject != null && sharedVariablesCollectionProperty != null;
         }
 
+        private void Initialize()
+        {
+            InitializeSharedVariablesContainer();
+            
+            sharedVariablesContainerSerializedObject = new SerializedObject(sharedVariablesContainer);
+            sharedVariablesCollectionProperty = sharedVariablesContainerSerializedObject.FindProperty(EditorUtils.GetBackingFieldName(nameof(SharedVariableContainer.SharedVariablesCollection)));
+        }
+        
         private void InitializeSharedVariablesContainer()
         {
-            sharedVaraiblesContainer = ScriptableObject.CreateInstance<SharedVariableContainer>();
+            sharedVariablesContainer = ScriptableObject.CreateInstance<SharedVariableContainer>();
 
             foreach (SharedVariableTypeData sharedVariableTypeData in InspectorData.SharedVariablesTypeDataCollection)
             {
-                if (SV.TryGet(sharedVariableTypeData.SharedVariableType, out ISharedVariable sharedVariableInterface))
+                if (!SV.TryGet(sharedVariableTypeData.SharedVariableType, out ISharedVariable sharedVariableInterface))
                 {
-                    if (sharedVariableInterface is not SharedVariable sharedVariable)
-                    {
-                        //TODO log
-                        continue;
-                    }
-
-                    sharedVariable.editorValueChanged += RefreshInspectorWindow;
-                    RuntimeSharedVariableInspectorData data = new(sharedVariable);
-
-                    sharedVaraiblesContainer.SharedVariablesCollection.Add(data);
+                    //TODO log
+                    continue;
                 }
+
+                if (sharedVariableInterface is not SharedVariable sharedVariable)
+                {
+                    //TODO log
+                    continue;
+                }
+
+                sharedVariable.editorValueChanged += RefreshInspectorWindow;
+                RuntimeSharedVariableInspectorData data = new(sharedVariable);
+
+                sharedVariablesContainer.SharedVariablesCollection.Add(data);
             }
 
-            sharedVaraiblesContainer.InitializeSharedVariables();
+            sharedVariablesContainer.InitializeSharedVariables();
         }
     }
 }

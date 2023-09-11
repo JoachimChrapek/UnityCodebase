@@ -30,26 +30,19 @@ namespace FazApp.SharedVariables.Editor
             GUILayout.BeginVertical("box");
             
             ExtendedGUI.DrawLabel(sharedVariableTypeData.SharedVariableType.FullName);
-            DrawSharedVariableScriptableObject(sharedVariableTypeData);
+            DrawSharedVariableScriptableObjectInfo(sharedVariableTypeData);
             
             GUILayout.EndVertical();
         }
         
-        private void DrawSharedVariableScriptableObject(SharedVariableTypeData sharedVariableTypeData)
+        private void DrawSharedVariableScriptableObjectInfo(SharedVariableTypeData sharedVariableTypeData)
         {
             GUILayout.BeginHorizontal();
             ExtendedGUI.DrawLabel("Scriptable object:", GUILayout.Width(400));
 
             if (sharedVariableTypeData.ScriptableObjectInstance == null)
             {
-                if (sharedVariableTypeData.HaveScriptableObjectType == false)
-                {
-                    ExtendedGUI.DrawLabel($"Couldn't find SharedVariableScriptableObject with value type {sharedVariableTypeData.ShredVariableValueType.FullName}");
-                }
-                else
-                {
-                    DrawDelayedButton("Create scriptable object", () => CreateScriptableObjectForSharedVariableType(sharedVariableTypeData));
-                }
+                DrawSharedVariableScriptableObjectCreationMenu(sharedVariableTypeData);
             }
             else
             {
@@ -59,6 +52,18 @@ namespace FazApp.SharedVariables.Editor
             }
             
             GUILayout.EndHorizontal();
+        }
+
+        private void DrawSharedVariableScriptableObjectCreationMenu(SharedVariableTypeData sharedVariableTypeData)
+        {
+            if (sharedVariableTypeData.HaveScriptableObjectType)
+            {
+                DrawDelayedButton("Create scriptable object", () => CreateScriptableObjectForSharedVariableType(sharedVariableTypeData));
+            }
+            else
+            {
+                ExtendedGUI.DrawLabel($"Couldn't find SharedVariableScriptableObject with value type {sharedVariableTypeData.ShredVariableValueType.FullName}");
+            }
         }
         
         private void CreateScriptableObjectForSharedVariableType(SharedVariableTypeData sharedVariableTypeData)
