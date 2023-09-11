@@ -54,12 +54,12 @@ namespace FazApp.SharedVariables
             
             assignedSharedVariableType = GetAssignedSharedVariableType();
 
-            if (!SV.TryGet(assignedSharedVariableType, out assignedSharedVariable))
+            if (assignedSharedVariableType == null || !SV.TryGet(assignedSharedVariableType, out assignedSharedVariable))
             {
                 //TODO use logger
                 Debug.LogError("Couldn't get assigned shared variable during initialization\n" +
                                $"Scriptable object: {name}\n" +
-                               $"Assigned Shared Variable type string: {assignedSharedVariableType}");
+                               $"Assigned Shared Variable type string: {AssignedSharedVariableTypeName}");
             }
         }
         
