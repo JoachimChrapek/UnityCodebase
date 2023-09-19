@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using UnityEditor;
-using UnityEngine;
 
 namespace FazApp.SharedVariables.Editor
 {
@@ -25,14 +24,10 @@ namespace FazApp.SharedVariables.Editor
             List<string> pathsCollection = new();
             string[] guidsCollection = AssetDatabase.FindAssets($"t: {nameof(SharedVariableScriptableObject)}");
         
-            Debug.Log(guidsCollection.Length);
-            
             foreach (string guid in guidsCollection)
             {
                 string path = AssetDatabase.GUIDToAssetPath(guid);
                 pathsCollection.Add(path);
-                
-                Debug.Log(guid + "   " + pathsCollection);
             }
 
             return pathsCollection;

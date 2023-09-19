@@ -23,9 +23,6 @@ namespace FazApp.SharedVariables.Editor
             {
                 sharedVariableWrapper.CachedSharedVariable.EditorDecomission();
             }
-
-            //TODO remove
-            Debug.Log("DecomissionSharedVariables");
         }
 
         private void OnDestroy()
