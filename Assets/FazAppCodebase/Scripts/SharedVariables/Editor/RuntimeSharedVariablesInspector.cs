@@ -37,6 +37,7 @@ namespace FazApp.SharedVariables.Editor
                 SerializedProperty sharedVariableSerializedProperty = sharedVariablesCollectionProperty.GetArrayElementAtIndex(i);
 
                 DrawSharedVariable(sharedVariable, sharedVariableData, sharedVariableSerializedProperty);
+                GUILayout.Space(5.0f);
             }
         }
 
@@ -50,10 +51,13 @@ namespace FazApp.SharedVariables.Editor
             GUILayout.BeginVertical("box");
 
             ExtendedGUI.DrawLabel(sharedVariable.GetType().FullName);
-            sharedVariableData.IsAutoSaveEnabled = EditorGUILayout.Toggle("Auto save", sharedVariableData.IsAutoSaveEnabled);
 
             DrawSharedVariableEditorValue(sharedVariableSerializedProperty, out bool valueChanged);
             HandleEditorValueChange(valueChanged);
+            
+            GUILayout.Space(5.0f);
+            
+            sharedVariableData.IsAutoSaveEnabled = EditorGUILayout.Toggle("Auto save", sharedVariableData.IsAutoSaveEnabled);
             HandleAutoSaveOptions(sharedVariable, sharedVariableData.IsAutoSaveEnabled, valueChanged);
 
             ExtendedGUI.DrawButton("Notify value changed", sharedVariable.ForceNotifyValueChanged);
@@ -64,7 +68,8 @@ namespace FazApp.SharedVariables.Editor
         private void DrawSharedVariableEditorValue(SerializedProperty sharedVariableSerializedProperty, out bool valueChanged)
         {
             EditorGUI.BeginChangeCheck();
-            EditorGUILayout.PropertyField(sharedVariableSerializedProperty.FindPropertyRelative(EditorUtils.GetBackingFieldName(nameof(RuntimeSharedVariableInspectorData.CachedSharedVariable)) + "." + EditorUtils.GetBackingFieldName("EditorValue")), true);
+            SerializedProperty property = sharedVariableSerializedProperty.FindPropertyRelative(EditorUtils.GetBackingFieldName(nameof(RuntimeSharedVariableInspectorData.CachedSharedVariable)) + "." + EditorUtils.GetBackingFieldName("EditorValue"));
+            EditorGUILayout.PropertyField(property, new GUIContent("Value:"), true);
             valueChanged = EditorGUI.EndChangeCheck();
         }
 
@@ -88,15 +93,15 @@ namespace FazApp.SharedVariables.Editor
                     sharedVariable.UpdateValueAfterEditorChange();
                 }
             }
-            else
-            {
-                EditorGUILayout.BeginHorizontal();
+
+            GUI.enabled = !isAutoSaveEnabled;
+            EditorGUILayout.BeginHorizontal();
+            
+            ExtendedGUI.DrawButton("Save value", sharedVariable.UpdateValueAfterEditorChange);
+            ExtendedGUI.DrawButton("Reset value", sharedVariable.UpdateEditorValue);
                 
-                ExtendedGUI.DrawButton("Save value", sharedVariable.UpdateValueAfterEditorChange);
-                ExtendedGUI.DrawButton("Reset value", sharedVariable.UpdateEditorValue);
-                
-                EditorGUILayout.EndHorizontal();
-            }
+            EditorGUILayout.EndHorizontal();
+            GUI.enabled = true;
         }
         
         private bool IsInitialized()

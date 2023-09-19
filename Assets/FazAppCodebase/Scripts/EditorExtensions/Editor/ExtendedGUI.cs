@@ -8,7 +8,6 @@ namespace FazApp.EditorExtensions.Editor
         public static void DrawLabel(string labelText, params GUILayoutOption[] options)
         {
             GUILayout.Label(labelText, options);
-            
         }
 
         public static void DrawButton(string buttonText, Action onButtonClicked)

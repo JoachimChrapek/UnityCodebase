@@ -19,6 +19,7 @@ namespace FazApp.SharedVariables.Editor
                 if (CanDrawSharedVariable(sharedVariableTypeData.SharedVariableType))
                 {
                     DrawSharedVariable(sharedVariableTypeData);
+                    GUILayout.Space(5.0f);
                 }
             }
         }
