@@ -7,18 +7,16 @@ namespace FazApp.SharedVariables.Editor
 {
     public class EditorSharedVariablesInspector : SharedVariablesInspector
     {
-        public override void DrawInspector()
+        protected override void DrawInspectorContent()
         {
-            base.DrawInspector();
-            
-            DrawSharedVariablesTypeCollection();            
+            DrawSharedVariablesTypeCollection();  
         }
-        
+
         private void DrawSharedVariablesTypeCollection()
         {
             foreach (SharedVariableTypeData sharedVariableTypeData in InspectorData.SharedVariablesTypeDataCollection)
             {
-                if(CanDrawSharedVariable(sharedVariableTypeData.SharedVariableType))
+                if (CanDrawSharedVariable(sharedVariableTypeData.SharedVariableType))
                 {
                     DrawSharedVariable(sharedVariableTypeData);
                 }
@@ -58,7 +56,7 @@ namespace FazApp.SharedVariables.Editor
         {
             if (sharedVariableTypeData.HaveScriptableObjectType)
             {
-                DrawDelayedButton("Create scriptable object", () => CreateScriptableObjectForSharedVariableType(sharedVariableTypeData));
+                ExtendedGUI.DrawButton("Create scriptable object", () => CreateScriptableObjectForSharedVariableType(sharedVariableTypeData));
             }
             else
             {
@@ -74,11 +72,9 @@ namespace FazApp.SharedVariables.Editor
             scriptableObjectInstance.SetAssignedSharedVariableTypeName(sharedVariableTypeData.SharedVariableType);
             
             AssetDatabase.CreateAsset(scriptableObjectInstance, filePath);
-            
             SharedVariableScriptableObject scriptableObjectAsset = AssetDatabase.LoadAssetAtPath<SharedVariableScriptableObject>(filePath);
-            // ScriptableObjectsContainer.Add(scriptableObjectAsset);
-
             EditorUtility.SetDirty(scriptableObjectAsset);
+            
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
             

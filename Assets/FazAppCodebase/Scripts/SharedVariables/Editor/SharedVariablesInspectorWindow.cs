@@ -39,9 +39,6 @@ namespace FazApp.SharedVariables.Editor
 
         private void DrawInspector()
         {
-            //TODO verify if we need refresh button - it should be automatic
-            ExtendedGUI.DrawButton("Refresh", RefreshWindow);
-
             GUILayout.Space(10);
             
             searchBarController.DrawSearchBar();
@@ -89,7 +86,6 @@ namespace FazApp.SharedVariables.Editor
             inspector.Initialize(inspectorData, searchBarController);
 
             inspector.reinitializeRequested += ReinitializeWindow;
-            inspector.refreshRequested += RefreshWindow;
 
             return inspector;
         }
@@ -98,11 +94,6 @@ namespace FazApp.SharedVariables.Editor
         {
             scriptableObjectsContainer.RefreshScriptableObjectsCollection();
             RefreshSharedVariablesTypesCollection();
-            RefreshWindow();
-        }
-        
-        private void RefreshWindow()
-        {
             Repaint();
         }
         

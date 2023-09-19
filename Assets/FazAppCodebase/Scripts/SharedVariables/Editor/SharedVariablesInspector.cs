@@ -3,15 +3,14 @@ using System;
 
 namespace FazApp.SharedVariables.Editor
 {
-    public class SharedVariablesInspector
+    public abstract class SharedVariablesInspector
     {
         public event Action reinitializeRequested;
-        public event Action refreshRequested;
         
         protected SharedVariablesInspectorData InspectorData { get; private set; }
         private SearchBarController searchBarController;
         
-        private Action delayedButtonAction;
+        private bool reinitializationRequestedFlag;
         
         public void Initialize(SharedVariablesInspectorData inspectorData, SearchBarController searchBarController)
         {
@@ -19,24 +18,17 @@ namespace FazApp.SharedVariables.Editor
             this.searchBarController = searchBarController;
         }
         
-        public virtual void DrawInspector()
+        public void DrawInspector()
         {
-            TryInvokeDelayedButtonAction();
+            DrawInspectorContent();
+            TryReinitializeInspectorWindow();
         }
 
-        protected void DrawDelayedButton(string buttonText, Action delayedAction)
-        {
-            ExtendedGUI.DrawButton(buttonText, () => delayedButtonAction = delayedAction);
-        }
-        
-        protected void RefreshInspectorWindow()
-        {
-            refreshRequested?.Invoke();
-        }
-        
+        protected abstract void DrawInspectorContent();
+
         protected void ReinitializeInspectorWindow()
         {
-            reinitializeRequested?.Invoke();
+            reinitializationRequestedFlag = true;
         }
 
         protected virtual bool CanDrawSharedVariable(Type sharedVariableType)
@@ -44,13 +36,15 @@ namespace FazApp.SharedVariables.Editor
             return string.IsNullOrEmpty(searchBarController.SearchText) || sharedVariableType.FullName.Contains(searchBarController.SearchText, StringComparison.InvariantCultureIgnoreCase);
         }
         
-        private void TryInvokeDelayedButtonAction()
+        private void TryReinitializeInspectorWindow()
         {
-            if (delayedButtonAction != null)
+            if (!reinitializationRequestedFlag)
             {
-                delayedButtonAction.Invoke();
-                delayedButtonAction = null;
+                return;
             }
+
+            reinitializationRequestedFlag = false;
+            reinitializeRequested?.Invoke();
         }
 
     }

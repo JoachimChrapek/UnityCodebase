@@ -11,30 +11,23 @@ namespace FazApp.SharedVariables.Editor
         private SerializedProperty sharedVariablesCollectionProperty;
 
         private UnityEditor.Editor cachedSharedVariabledContainerEditor;
-
+        
         ~RuntimeSharedVariablesInspector()
         {
-            foreach (RuntimeSharedVariableInspectorData sharedVariableData in sharedVariablesContainer.SharedVariablesCollection)
-            {
-                sharedVariableData.CachedSharedVariable.editorValueChanged -= RefreshInspectorWindow;
-            }
-
             sharedVariablesContainer.DecomissionSharedVariables();
         }
 
-        public override void DrawInspector()
+        protected override void DrawInspectorContent()
         {
             if (!IsInitialized())
             {
                 Initialize();
             }
 
-            base.DrawInspector();
-
             sharedVariablesContainerSerializedObject.Update();
             DrawSharedVariablesCollection();
         }
-
+        
         private void DrawSharedVariablesCollection()
         {
             for (int i = 0; i < sharedVariablesContainer.SharedVariablesCollection.Count; i++)
@@ -97,8 +90,12 @@ namespace FazApp.SharedVariables.Editor
             }
             else
             {
+                EditorGUILayout.BeginHorizontal();
+                
                 ExtendedGUI.DrawButton("Save value", sharedVariable.UpdateValueAfterEditorChange);
                 ExtendedGUI.DrawButton("Reset value", sharedVariable.UpdateEditorValue);
+                
+                EditorGUILayout.EndHorizontal();
             }
         }
         
@@ -133,7 +130,6 @@ namespace FazApp.SharedVariables.Editor
                     continue;
                 }
 
-                sharedVariable.editorValueChanged += RefreshInspectorWindow;
                 RuntimeSharedVariableInspectorData data = new(sharedVariable);
 
                 sharedVariablesContainer.SharedVariablesCollection.Add(data);
