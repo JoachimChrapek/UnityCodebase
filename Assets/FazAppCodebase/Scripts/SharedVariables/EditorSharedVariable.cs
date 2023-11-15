@@ -8,9 +8,7 @@ namespace FazApp.SharedVariables
     {
         internal event Action editorValueChanged;
         
-        //TODO better name
         internal abstract void EditorInitialization();
-        //TODO better name
         internal abstract void EditorDecomission();
         
         internal abstract void UpdateEditorValue();
@@ -28,7 +26,6 @@ namespace FazApp.SharedVariables
         [field: SerializeField]
         internal T EditorValue { get; set; }
 
-        //TODO better name
         private bool isEditorInitialized;
         
         internal override void EditorInitialization()
