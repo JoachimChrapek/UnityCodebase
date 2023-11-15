@@ -7,7 +7,7 @@ namespace FazApp.SharedVariables.Editor
 {
     public class RuntimeSharedVariablesInspector : SharedVariablesInspector
     {
-        private SharedVariableContainer sharedVariablesContainer;
+        private RuntimeSharedVariableInspectorDataContainer runtimeSharedVariablesContainer;
         private SerializedObject sharedVariablesContainerSerializedObject;
         private SerializedProperty sharedVariablesCollectionProperty;
 
@@ -15,7 +15,7 @@ namespace FazApp.SharedVariables.Editor
         
         ~RuntimeSharedVariablesInspector()
         {
-            sharedVariablesContainer.DecomissionSharedVariables();
+            runtimeSharedVariablesContainer.DecomissionSharedVariables();
         }
 
         protected override void DrawInspectorContent()
@@ -31,9 +31,9 @@ namespace FazApp.SharedVariables.Editor
         
         private void DrawSharedVariablesCollection()
         {
-            for (int i = 0; i < sharedVariablesContainer.SharedVariablesCollection.Count; i++)
+            for (int i = 0; i < runtimeSharedVariablesContainer.SharedVariablesCollection.Count; i++)
             {
-                RuntimeSharedVariableInspectorData sharedVariableData = sharedVariablesContainer.SharedVariablesCollection[i];
+                RuntimeSharedVariableInspectorData sharedVariableData = runtimeSharedVariablesContainer.SharedVariablesCollection[i];
                 SharedVariable sharedVariable = sharedVariableData.CachedSharedVariable;
                 SerializedProperty sharedVariableSerializedProperty = sharedVariablesCollectionProperty.GetArrayElementAtIndex(i);
 
@@ -107,20 +107,20 @@ namespace FazApp.SharedVariables.Editor
         
         private bool IsInitialized()
         {
-            return sharedVariablesContainer != null && sharedVariablesContainer.SharedVariablesCollection != null && sharedVariablesContainerSerializedObject != null && sharedVariablesCollectionProperty != null;
+            return runtimeSharedVariablesContainer != null && runtimeSharedVariablesContainer.SharedVariablesCollection != null && sharedVariablesContainerSerializedObject != null && sharedVariablesCollectionProperty != null;
         }
 
         private void Initialize()
         {
             InitializeSharedVariablesContainer();
             
-            sharedVariablesContainerSerializedObject = new SerializedObject(sharedVariablesContainer);
-            sharedVariablesCollectionProperty = sharedVariablesContainerSerializedObject.FindProperty(EditorUtils.GetBackingFieldName(nameof(SharedVariableContainer.SharedVariablesCollection)));
+            sharedVariablesContainerSerializedObject = new SerializedObject(runtimeSharedVariablesContainer);
+            sharedVariablesCollectionProperty = sharedVariablesContainerSerializedObject.FindProperty(EditorUtils.GetBackingFieldName(nameof(RuntimeSharedVariableInspectorDataContainer.SharedVariablesCollection)));
         }
         
         private void InitializeSharedVariablesContainer()
         {
-            sharedVariablesContainer = ScriptableObject.CreateInstance<SharedVariableContainer>();
+            runtimeSharedVariablesContainer = ScriptableObject.CreateInstance<RuntimeSharedVariableInspectorDataContainer>();
 
             foreach (SharedVariableTypeData sharedVariableTypeData in InspectorData.SharedVariablesTypeDataCollection)
             {
@@ -131,10 +131,10 @@ namespace FazApp.SharedVariables.Editor
                 }
 
                 RuntimeSharedVariableInspectorData data = new(sharedVariableInterface as SharedVariable);
-                sharedVariablesContainer.SharedVariablesCollection.Add(data);
+                runtimeSharedVariablesContainer.SharedVariablesCollection.Add(data);
             }
 
-            sharedVariablesContainer.InitializeSharedVariables();
+            runtimeSharedVariablesContainer.InitializeSharedVariables();
         }
     }
 }

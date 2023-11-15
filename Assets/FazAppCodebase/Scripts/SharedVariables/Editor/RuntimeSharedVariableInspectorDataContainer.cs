@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace FazApp.SharedVariables.Editor
 {
-    public class SharedVariableContainer : ScriptableObject
+    public class RuntimeSharedVariableInspectorDataContainer : ScriptableObject
     {
         [field: SerializeField]
         public List<RuntimeSharedVariableInspectorData> SharedVariablesCollection { get; private set; } = new();
