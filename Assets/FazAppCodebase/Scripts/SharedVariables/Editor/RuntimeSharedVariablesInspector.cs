@@ -1,4 +1,5 @@
 using FazApp.EditorExtensions.Editor;
+using FazApp.Logging;
 using UnityEditor;
 using UnityEngine;
 
@@ -125,18 +126,11 @@ namespace FazApp.SharedVariables.Editor
             {
                 if (!SV.TryGet(sharedVariableTypeData.SharedVariableType, out ISharedVariable sharedVariableInterface))
                 {
-                    //TODO log
+                    Log.Warning($"Couldn't get shared variable for type: {sharedVariableTypeData.SharedVariableType}");
                     continue;
                 }
 
-                if (sharedVariableInterface is not SharedVariable sharedVariable)
-                {
-                    //TODO log
-                    continue;
-                }
-
-                RuntimeSharedVariableInspectorData data = new(sharedVariable);
-
+                RuntimeSharedVariableInspectorData data = new(sharedVariableInterface as SharedVariable);
                 sharedVariablesContainer.SharedVariablesCollection.Add(data);
             }
 

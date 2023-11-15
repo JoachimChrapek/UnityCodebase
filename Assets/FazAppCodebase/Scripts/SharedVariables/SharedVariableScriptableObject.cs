@@ -1,4 +1,5 @@
 using FazApp.EditorExtensions;
+using FazApp.Logging;
 using System;
 using UnityEngine;
 
@@ -56,10 +57,9 @@ namespace FazApp.SharedVariables
 
             if (assignedSharedVariableType == null || !SV.TryGet(assignedSharedVariableType, out assignedSharedVariable))
             {
-                //TODO use logger
-                Debug.LogError("Couldn't get assigned shared variable during initialization\n" +
-                               $"Scriptable object: {name}\n" +
-                               $"Assigned Shared Variable type string: {AssignedSharedVariableTypeName}");
+                Log.Error("Couldn't get assigned shared variable during initialization\n" +
+                                       $"Scriptable object: {name}\n" +
+                                       $"Assigned Shared Variable type string: {AssignedSharedVariableTypeName}");
             }
         }
         

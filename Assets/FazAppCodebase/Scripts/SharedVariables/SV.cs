@@ -1,7 +1,7 @@
+using FazApp.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 
 namespace FazApp.SharedVariables
 {
@@ -30,8 +30,7 @@ namespace FazApp.SharedVariables
         {
             if (!sharedVariableType.GetInterfaces().Contains(typeof(ISharedVariable)))
             {
-                //TODO add logger
-                Debug.LogError($"Type {sharedVariableType} does not implement {nameof(ISharedVariable)} interface");
+                Log.Error($"Type {sharedVariableType} does not implement {nameof(ISharedVariable)} interface");
 
                 sharedVariable = default;
                 return false;
@@ -55,8 +54,7 @@ namespace FazApp.SharedVariables
         {
             if (!sharedVariableType.GetInterfaces().Contains(typeof(ISharedVariable)))
             {
-                //TODO add logger
-                Debug.LogError($"Type {sharedVariableType} does not implement {nameof(ISharedVariable)} interface");
+                Log.Error($"Type {sharedVariableType} does not implement {nameof(ISharedVariable)} interface");
 
                 sharedVariable = default;
                 return false;
